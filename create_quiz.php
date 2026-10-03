@@ -1,0 +1,5 @@
+<?php
+session_start(); require 'config/database.php'; if(!isset($_SESSION['user_id'])){header('Location: login.php');exit;}
+if($_SERVER['REQUEST_METHOD']==='POST'){ $title=trim($_POST['title']); $desc=trim($_POST['description']); do{$code=strtoupper(substr(bin2hex(random_bytes(4)),0,6)); $c=$pdo->prepare('SELECT id FROM custom_quizzes WHERE join_code=?');$c->execute([$code]);}while($c->fetch()); $s=$pdo->prepare('INSERT INTO custom_quizzes(creator_id,title,description,join_code) VALUES(?,?,?,?)');$s->execute([$_SESSION['user_id'],$title,$desc,$code]); header('Location: edit_quiz.php?id='.$pdo->lastInsertId());exit; }
+$pageTitle='Create Quiz'; include 'includes/header.php'; ?>
+<h2>Create your quiz</h2><form method="post" class="card p-4"><label class="form-label">Quiz title</label><input required name="title" class="form-control mb-3"><label class="form-label">Description</label><textarea name="description" class="form-control mb-3"></textarea><button class="btn btn-primary">Create & Add Questions</button></form><?php include 'includes/footer.php'; ?>
