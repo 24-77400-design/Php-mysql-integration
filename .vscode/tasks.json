@@ -1,0 +1,54 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "check-env",
+			"type": "shell",
+			"command": "node -v && php -v",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "check-php",
+			"type": "shell",
+			"command": "php -v",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "find-php",
+			"type": "shell",
+			"command": "$paths = @('C:\\xampp\\php\\php.exe','C:\\php\\php.exe'); foreach ($p in $paths) { if (Test-Path $p) { Write-Output \"FOUND:$p\" } }; $env:PATH -split ';' | ForEach-Object { if ($_ -match 'php|xampp') { Write-Output $_ } }",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "find-php-tools",
+			"type": "shell",
+			"command": "Get-ChildItem 'C:\\xampp\\php' -Filter '*cs*fix*' -ErrorAction SilentlyContinue | Select-Object FullName; Get-ChildItem 'C:\\xampp\\php' -Filter 'php-cs-fixer*' -ErrorAction SilentlyContinue | Select-Object FullName",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "check-net",
+			"type": "shell",
+			"command": "try { $r = Invoke-WebRequest -Uri 'https://cs.symfony.com' -UseBasicParsing -TimeoutSec 15; Write-Output $r.StatusCode } catch { Write-Output $_.Exception.Message }",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "check-curl",
+			"type": "shell",
+			"command": "curl.exe -I --insecure https://cs.symfony.com",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "lint-all-php",
+			"type": "shell",
+			"command": "Get-ChildItem -Recurse -Filter *.php | ForEach-Object { & 'C:\\xampp\\php\\php.exe' -l $_.FullName }",
+			"isBackground": false,
+			"problemMatcher": []
+		}
+	]
+}

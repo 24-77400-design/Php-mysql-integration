@@ -1,0 +1,69 @@
+<?php
+session_start();
+
+if (!isset($_SESSION['user'])) {
+    header('Location: login.php');
+    exit;
+}
+
+require 'config/database.php';
+
+$cat = (int)($_GET['category'] ?? 0);
+$s = $pdo->prepare(
+    'SELECT c.name category_name,f.* FROM flashcards f JOIN categories c ON c.id=f.category_id WHERE f.category_id=? ORDER BY f.id'
+);
+$s->execute([$cat]);
+$cards = $s->fetchAll();
+$title = 'Flashcards';
+include 'includes/header.php';
+?>
+<h2><?= htmlspecialchars($cards[0]['category_name'] ?? '') ?> Flashcards</h2>
+<p class="text-muted">Click a card to flip it.</p>
+<div id="card" class="card flashcard p-5">
+    <div id="cardText"></div>
+</div>
+<div class="text-center mt-3">
+    <button class="btn btn-outline-dark" onclick="prev()">← Previous</button>
+    <span id="count" class="mx-3"></span>
+    <button class="btn btn-dark" onclick="next()">Next →</button>
+</div>
+<script>
+    const cards = <?= json_encode(
+        array_map(fn($x) => ['front' => $x['front_text'], 'back' => $x['back_text']], $cards),
+        JSON_UNESCAPED_SLASHES
+    ) ?>;
+    let i = 0, back = false;
+
+    function show() {
+        if (!cards.length) {
+            cardText.innerText = 'No flashcards yet.';
+            return;
+        }
+        cardText.innerText = back ? cards[i].back : cards[i].front;
+        count.innerText = (i + 1) + ' / ' + cards.length;
+    }
+
+    card.onclick = () => {
+        back = !back;
+        show();
+    };
+
+    function next() {
+        if (cards.length) {
+            i = (i + 1) % cards.length;
+            back = false;
+            show();
+        }
+    }
+
+    function prev() {
+        if (cards.length) {
+            i = (i - 1 + cards.length) % cards.length;
+            back = false;
+            show();
+        }
+    }
+
+    show();
+</script>
+<?php include 'includes/footer.php'; ?>

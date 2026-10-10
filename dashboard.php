@@ -1,0 +1,56 @@
+<?php
+session_start();
+
+if (!isset($_SESSION['user_id'])) {
+    header('Location: login.php');
+    exit;
+}
+
+$pageTitle = 'Dashboard';
+include 'includes/header.php';
+?>
+<div class="hero text-start mb-4">
+    <span class="badge bg-light text-dark rounded-pill px-3 py-2 mb-3">
+        ⚡ Interactive coding quizzes
+    </span>
+    <h1 class="display-5 fw-bold">
+        Hi, <?= htmlspecialchars($_SESSION['user_name'] ?? 'Coder') ?>!
+    </h1>
+    <p class="lead ms-0 mb-4">
+        Create timed quizzes, share a join code with friends, and import computer questions from an API.
+    </p>
+    <div class="d-flex gap-2 flex-wrap">
+        <a class="btn btn-light btn-lg" href="create_quiz.php">＋ Create a Quiz</a>
+        <a class="btn btn-outline-light btn-lg" href="join.php">⌨ Join a Quiz</a>
+    </div>
+</div>
+<div class="row g-3">
+    <div class="col-md-4">
+        <a href="create_quiz.php" class="text-decoration-none text-dark">
+            <div class="card stat-card topic-card">
+                <div class="icon-bubble">＋</div>
+                <h4>Create</h4>
+                <p class="text-muted mb-0">Build your own quiz and set a timer for every question.</p>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a href="my_quizzes.php" class="text-decoration-none text-dark">
+            <div class="card stat-card topic-card">
+                <div class="icon-bubble">{ }</div>
+                <h4>Manage</h4>
+                <p class="text-muted mb-0">Edit your questions, import from API, and share quiz codes.</p>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a href="history.php" class="text-decoration-none text-dark">
+            <div class="card stat-card topic-card">
+                <div class="icon-bubble">✓</div>
+                <h4>Results</h4>
+                <p class="text-muted mb-0">Review your previous quiz scores and completed attempts.</p>
+            </div>
+        </a>
+    </div>
+</div>
+<?php include 'includes/footer.php'; ?>
