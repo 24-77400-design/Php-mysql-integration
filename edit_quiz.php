@@ -1,9 +1,102 @@
 <?php
-session_start(); require 'config/database.php'; if(!isset($_SESSION['user_id'])){header('Location: login.php');exit;} $id=(int)($_GET['id']??0); $s=$pdo->prepare('SELECT * FROM custom_quizzes WHERE id=? AND creator_id=?');$s->execute([$id,$_SESSION['user_id']]);$quiz=$s->fetch();if(!$quiz)die('Quiz not found.');
-if(isset($_POST['add'])){$q=$pdo->prepare('INSERT INTO custom_questions(quiz_id,question_text,option_a,option_b,option_c,option_d,correct_answer,time_limit) VALUES(?,?,?,?,?,?,?,?)');$q->execute([$id,$_POST['question'],$_POST['a'],$_POST['b'],$_POST['c'],$_POST['d'],$_POST['correct'],max(5,min(300,(int)$_POST['time_limit']))]);header("Location: edit_quiz.php?id=$id");exit;}
-if(isset($_POST['publish'])){$pdo->prepare('UPDATE custom_quizzes SET is_published=1 WHERE id=? AND creator_id=?')->execute([$id,$_SESSION['user_id']]);header("Location: edit_quiz.php?id=$id");exit;}
-$q=$pdo->prepare('SELECT * FROM custom_questions WHERE quiz_id=? ORDER BY id');$q->execute([$id]);$questions=$q->fetchAll();$pageTitle='Edit Quiz';include 'includes/header.php';?>
-<div class="d-flex justify-content-between"><div><h2><?=htmlspecialchars($quiz['title'])?></h2><p>Join code: <b><?=htmlspecialchars($quiz['join_code'])?></b></p></div><a class="btn btn-outline-success h-25" href="api_import.php?id=<?=$id?>">Import from API</a></div>
-<div class="card p-4 mb-4"><h5>Add question</h5><form method="post"><textarea required name="question" class="form-control mb-2" placeholder="Question"></textarea><div class="row g-2"><?php foreach(['a','b','c','d'] as $x):?><div class="col-md-6"><input required name="<?=$x?>" class="form-control" placeholder="Option <?=strtoupper($x)?>"></div><?php endforeach;?></div><div class="row mt-2"><div class="col"><select name="correct" class="form-select"><option>A</option><option>B</option><option>C</option><option>D</option></select></div><div class="col"><div class="input-group"><input type="number" min="5" max="300" value="30" name="time_limit" class="form-control"><span class="input-group-text">seconds/item</span></div></div></div><button name="add" class="btn btn-primary mt-3">Add Question</button></form></div>
-<h5>Questions (<?=count($questions)?>)</h5><?php foreach($questions as $i=>$x):?><div class="question-item p-3 mb-2"><b><?=($i+1)?>. <?=htmlspecialchars($x['question_text'])?></b><div class="small text-muted">Correct: <?=$x['correct_answer']?> · Timer: <?=$x['time_limit']?> sec · <?=$x['source']?></div></div><?php endforeach;?>
-<form method="post"><button name="publish" class="btn btn-success" <?=count($questions)<1?'disabled':''?>>Publish Quiz</button></form><?php include 'includes/footer.php';?>
+session_start();
+require 'config/database.php';
+
+if (!isset($_SESSION['user_id'])) {
+    header('Location: login.php');
+    exit;
+}
+
+$id = (int)($_GET['id'] ?? 0);
+$s = $pdo->prepare('SELECT * FROM custom_quizzes WHERE id=? AND creator_id=?');
+$s->execute([$id, $_SESSION['user_id']]);
+$quiz = $s->fetch();
+
+if (!$quiz) {
+    die('Quiz not found.');
+}
+
+if (isset($_POST['add'])) {
+    $q = $pdo->prepare(
+        'INSERT INTO custom_questions(quiz_id,question_text,option_a,option_b,option_c,option_d,correct_answer,time_limit) VALUES(?,?,?,?,?,?,?,?)'
+    );
+    $q->execute([
+        $id,
+        $_POST['question'],
+        $_POST['a'],
+        $_POST['b'],
+        $_POST['c'],
+        $_POST['d'],
+        $_POST['correct'],
+        max(5, min(300, (int)$_POST['time_limit'])),
+    ]);
+    header("Location: edit_quiz.php?id=$id");
+    exit;
+}
+
+if (isset($_POST['publish'])) {
+    $pdo->prepare('UPDATE custom_quizzes SET is_published=1 WHERE id=? AND creator_id=?')
+        ->execute([$id, $_SESSION['user_id']]);
+    header("Location: edit_quiz.php?id=$id");
+    exit;
+}
+
+$q = $pdo->prepare('SELECT * FROM custom_questions WHERE quiz_id=? ORDER BY id');
+$q->execute([$id]);
+$questions = $q->fetchAll();
+$pageTitle = 'Edit Quiz';
+include 'includes/header.php';
+?>
+<div class="d-flex justify-content-between">
+    <div>
+        <h2><?= htmlspecialchars($quiz['title']) ?></h2>
+        <p>Join code: <b><?= htmlspecialchars($quiz['join_code']) ?></b></p>
+    </div>
+    <a class="btn btn-outline-success h-25" href="api_import.php?id=<?= $id ?>">Import from API</a>
+</div>
+<div class="card p-4 mb-4">
+    <h5>Add question</h5>
+    <form method="post">
+        <textarea required name="question" class="form-control mb-2" placeholder="Question"></textarea>
+        <div class="row g-2">
+            <?php foreach (['a', 'b', 'c', 'd'] as $x): ?>
+                <div class="col-md-6">
+                    <input required name="<?= $x ?>" class="form-control"
+                        placeholder="Option <?= strtoupper($x) ?>">
+                </div>
+            <?php endforeach; ?>
+        </div>
+        <div class="row mt-2">
+            <div class="col">
+                <select name="correct" class="form-select">
+                    <option>A</option>
+                    <option>B</option>
+                    <option>C</option>
+                    <option>D</option>
+                </select>
+            </div>
+            <div class="col">
+                <div class="input-group">
+                    <input type="number" min="5" max="300" value="30" name="time_limit" class="form-control">
+                    <span class="input-group-text">seconds/item</span>
+                </div>
+            </div>
+        </div>
+        <button name="add" class="btn btn-primary mt-3">Add Question</button>
+    </form>
+</div>
+<h5>Questions (<?= count($questions) ?>)</h5>
+<?php foreach ($questions as $i => $x): ?>
+    <div class="question-item p-3 mb-2">
+        <b><?= ($i + 1) ?>. <?= htmlspecialchars($x['question_text']) ?></b>
+        <div class="small text-muted">
+            Correct: <?= $x['correct_answer'] ?> · Timer: <?= $x['time_limit'] ?> sec · <?= $x['source'] ?>
+        </div>
+    </div>
+<?php endforeach; ?>
+<form method="post">
+    <button name="publish" class="btn btn-success" <?= count($questions) < 1 ? 'disabled' : '' ?>>
+        Publish Quiz
+    </button>
+</form>
+<?php include 'includes/footer.php'; ?>

@@ -39,17 +39,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Invalid email or password.';
     }
 }
-$pageTitle='Login';
+$pageTitle = 'Login';
 include 'includes/header.php';
 ?>
-<div class="row justify-content-center"><div class="col-md-5"><div class="card p-4">
-<h2>Welcome Back</h2>
-<?php if(isset($_GET['registered'])):?><div class="alert alert-success">Account created. You can now log in.</div><?php endif;?>
-<?php if($error):?><div class="alert alert-danger"><?=htmlspecialchars($error)?></div><?php endif;?>
-<form method="post">
-<input class="form-control mb-3" type="email" name="email" value="<?=htmlspecialchars($email)?>" placeholder="Email" autocomplete="email" required>
-<input class="form-control mb-3" type="password" name="password" placeholder="Password" autocomplete="current-password" required>
-<button class="btn btn-dark w-100" type="submit">Login</button>
-</form><p class="mt-3 mb-0">No account? <a href="register.php">Register</a></p>
-</div></div></div>
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        <div class="card p-4">
+            <h2>Welcome Back</h2>
+            <?php if (isset($_GET['registered'])): ?>
+                <div class="alert alert-success">Account created. You can now log in.</div>
+            <?php endif; ?>
+            <?php if ($error): ?>
+                <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
+            <?php endif; ?>
+            <form method="post">
+                <input class="form-control mb-3" type="email" name="email"
+                    value="<?= htmlspecialchars($email) ?>" placeholder="Email" autocomplete="email" required>
+                <input class="form-control mb-3" type="password" name="password"
+                    placeholder="Password" autocomplete="current-password" required>
+                <button class="btn btn-dark w-100" type="submit">Login</button>
+            </form>
+            <p class="mt-3 mb-0">No account? <a href="register.php">Register</a></p>
+        </div>
+    </div>
+</div>
 <?php include 'includes/footer.php'; ?>
